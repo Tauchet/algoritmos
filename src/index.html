@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmos</title>
+    <link rel="stylesheet" href="/public/estilos.css">
+</head>
+<body>
+    <main id="app">
+        <div class="escenario inicio" data-escenario="inicio">
+            <div id="inicio-contenedor">
+                <h2>JUEGO</h2>
+                <form id="inicio-contenedor-form" action="#" method="POST">
+                    <div>
+                        <label for="inicio-nombre-usuario">NOMBRE</label>
+                        <input type="text" id="inicio-nombre-usuario">
+                    </div>
+                    <button class="btn">NUEVA PARTIDA</button>
+                </form>
+                <a href="/estadisticas" class="btn">ESTADÍSTICAS</a>
+            </div>
+        </div>
+        <div class="escenario preguntas" data-escenario="preguntas">
+            <div id="preguntas-contenedor">
+                <div id="preguntas-contendor-satisfacion">
+                    <div class="preguntas-contendor-satisfacion-titulo">
+                        <h1>PREGUNTAS FINALES</h1>
+                    </div>
+                    <div class="preguntas-contendor-satisfacion-elem" data-pregunta="1">
+                        <div class="preguntas-contendor-satisfacion-elem__titulo">
+                            <h3>¿QUÉ TAN COMPLEJOS LE PARECIERON LOS MAPAS?</h3>
+                        </div>
+                        <div class="preguntas-contendor-satisfacion-elem__opciones">
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">1</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">2</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">3</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">4</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">5</button>
+                        </div>
+                    </div>
+                    <div class="preguntas-contendor-satisfacion-elem" data-pregunta="2">
+                        <div class="preguntas-contendor-satisfacion-elem__titulo">
+                            <h3>¿QUÉ TANTO SE DIVIRTIÓ COMPLENTANDO LOS MAPAS?</h3>
+                        </div>
+                        <div class="preguntas-contendor-satisfacion-elem__opciones">
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">1</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">2</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">3</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">4</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">5</button>
+                        </div>
+                    </div>
+                    <div class="preguntas-contendor-satisfacion-elem" data-pregunta="3">
+                        <div class="preguntas-contendor-satisfacion-elem__titulo">
+                            <h3>¿QUÉ TAN INTUITIVO LE PARECIÓ LA FUNCIONALIDAD DEL JUEGO?</h3>
+                        </div>
+                        <div class="preguntas-contendor-satisfacion-elem__opciones">
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">1</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">2</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">3</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">4</button>
+                            <button class="btn preguntas-contendor-satisfacion-elem__button">5</button>
+                        </div>
+                    </div>
+                    <div class="preguntas-contenedor-satisfacion-boton">
+                        <button id="preguntas-terminar-boton" class="btn big">ENVIAR</button>
+                    </div>
+                </div>
+                <div id="preguntas-contenedor-respuestas">
+                    <div id="preguntas-contenedor-titulo">
+                        <h2>RESUMEN</h2>
+                    </div>
+                    <div class="pregunta-respuesta" data-numero="1">
+                        <div class="pregunta-respuesta-imagen">
+                            <img src="" alt="">
+                        </div>
+                        <div class="pregunta-respuesta-texto">
+                            <h2>NIVEL 1</h2>
+                            <p>RESPUESTA CORRECTA</p>
+                        </div>
+                    </div>
+                    <div class="pregunta-respuesta" data-numero="2">
+                        <div class="pregunta-respuesta-imagen">
+                            <img src="" alt="">
+                        </div>
+                        <div class="pregunta-respuesta-texto">
+                            <h2>NIVEL 2</h2>
+                            <p>RESPUESTA CORRECTA</p>
+                        </div>
+                    </div>
+                    <div class="pregunta-respuesta" data-numero="3">
+                        <div class="pregunta-respuesta-imagen">
+                            <img src="" alt="">
+                        </div>
+                        <div class="pregunta-respuesta-texto">
+                            <h2>NIVEL 3</h2>
+                            <p>RESPUESTA CORRECTA</p>
+                        </div>
+                    </div>
+                    <div class="pregunta-respuesta" data-numero="4">
+                        <div class="pregunta-respuesta-imagen">
+                            <img src="" alt="">
+                        </div>
+                        <div class="pregunta-respuesta-texto">
+                            <h2>NIVEL 4</h2>
+                            <p>RESPUESTA CORRECTA</p>
+                        </div>
+                    </div>
+                    <div class="pregunta-respuesta" data-numero="5">
+                        <div class="pregunta-respuesta-imagen">
+                            <img src="" alt="">
+                        </div>
+                        <div class="pregunta-respuesta-texto">
+                            <h2>NIVEL 5</h2>
+                            <p>RESPUESTA CORRECTA</p>
+                        </div>
+                    </div>
+                    <div id="preguntas-contenedor-boton">
+                        <button id="preguntas-siguiente-boton" class="btn big">SIGUIENTE</button>
+                    </div>
+                </div>
+
+                
+
+            </div>
+        </div>
+        <div class="escenario resultado" data-escenario="resultado">
+            <div id="resultado-contenedor">
+                <h1 id="resultado-texto">¡TEXTO!</h1>
+                <img id="resultado-mapa" src="#" alt="">
+                <div id="resultado-progreso">
+                    <p>Siguiente Pregunta en 3...</p>
+                    <div id="resultado-progreso-actual"></div>
+                </div>
+            </div>
+        </div>
+        <div class="escenario juego" data-escenario="juego">
+            <div class="grid">
+                <section class="grid-juego">
+                    <div class="grid-juego-titulo">
+                        <p>MAPA</p>
+                    </div>
+                    <div class="grid-juego-contenedor">
+                        <canvas width="64px" height="64px"></canvas>
+                    </div>
+                </section>
+                <section id="juego-grid-control">
+                    <div id="juego-grid-control-titulo">
+                        <p>AGREGA LOS MOVIMIENTOS DESEADOS</p>
+                    </div>
+                    <section id="juego-grid-control-botones">
+                        <ul id="juego-grid-movimientos">
+                            <li class="juego-elemento-boton boton-arriba" data-movimiento="1">
+                                <div class="juego-elemento-icono">
+                                    <img src="/public/imagenes/boton-arriba.png" alt="">
+                                </div>
+                                <div class="juego-elemento-info">
+                                    <div class="juego-elemento-info-texto">
+                                        <p>ARRIBA</p>
+                                    </div>
+                                    <button class="juego-elemento-info-boton">
+                                        X
+                                    </button>
+                                </div>
+                            </li>
+                            
+                            <li class="juego-elemento-boton boton-izquierda" data-movimiento="2">
+                                <div class="juego-elemento-icono">
+                                    <img src="/public/imagenes/boton-izquierda.png" alt="">
+                                </div>
+                                <div class="juego-elemento-info">
+                                    <div class="juego-elemento-info-texto">
+                                        <p>IZQUIERDA</p>
+                                    </div>
+                                    <button class="juego-elemento-info-boton">
+                                        X
+                                    </button>
+                                </div>
+                            </li>
+                            <li class="juego-elemento-boton boton-abajo" data-movimiento="0">
+                                <div class="juego-elemento-icono">
+                                    <img src="/public/imagenes/boton-abajo.png" alt="">
+                                </div>
+                                <div class="juego-elemento-info">
+                                    <div class="juego-elemento-info-texto">
+                                        <p>ABAJO</p>
+                                    </div>
+                                    <button class="juego-elemento-info-boton">X</button>
+                                </div>
+                            </li>
+                            
+                            <li class="juego-elemento-boton boton-derecha" data-movimiento="3">
+                                <div class="juego-elemento-icono">
+                                    <img src="/public/imagenes/boton-derecha.png" alt="">
+                                </div>
+                                <div class="juego-elemento-info">
+                                    <div class="juego-elemento-info-texto">
+                                        <p>DERECHA</p>
+                                    </div>
+                                    <button class="juego-elemento-info-boton">
+                                        X
+                                    </button>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                    <section id="juego-grid-control-movimientos">
+                        <ul id="juego-grid-final-movimientos">
+                            
+                        </ul>
+                    </section>
+                    <button class="btn" id="juego-ejecutar">EJECUTAR</button>
+                </section>
+            </div>
+        </div>
+    </main>
+    <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="/public/main.js" type="module"></script>
+</body>
+</html>

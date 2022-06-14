@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas | Algoritmos</title>
+    <link rel="stylesheet" href="/public/estadisticas.css">
+</head>
+<body>
+    
+    <main id="app">
+        
+        <div class="tabla-contenido">
+            <div class="tabla-titulo">
+                <h3>TOP DE JUGADORES</h3>
+            </div>
+            <table id="tabla-de-jugadores">
+                <tr>
+                    <th>Lugar</th>
+                    <th>Nombre</th>
+                    <th>Nota</th>
+                </tr>
+                <!--- AGREGANDO FILAS -->
+            </table>
+        </div>
+    
+        <div class="tabla-contenido">
+            <div class="tabla-titulo">
+                <h3>RESPUESTAS DE JUGADORES</h3>
+            </div>
+            <table id="tabla-de-preguntas">
+                <tr>
+                    <th>#</th>
+                    <th>Jugadores Contestaron Bien</th>
+                    <th>Jugadores Contestaron Mal</th>
+                </tr>
+            </table>
+        </div>
+    
+        <div class="tabla-contenido">
+            <div class="tabla-titulo">
+                <h3>RESPUESTAS DE SATISFACCIÓN</h3>
+            </div>
+            <table id="tabla-de-satisfaccion">
+                <tr>
+                    <th>#</th>
+                    <th>Promedio de Calificación</th>
+                    <th>Menor Calificación</th>
+                    <th>Mayor Calificación</th>
+                    <th>Jugadores</th>
+                </tr>
+            </table>
+        </div>
+        
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+    <script src="/public/estadisticas.js"></script>
+</body>
+</html>
