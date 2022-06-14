@@ -60,8 +60,8 @@ export default class Jugador {
         this.niveles = respuesta.data.success;
         this.nuevo = false;
       } catch (e) {
-        console.log(e);
         alert("¡Ha ocurrido un error!");
+        window.location.reload();
       }
     }
   }

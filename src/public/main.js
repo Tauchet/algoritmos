@@ -386,7 +386,6 @@ function ejecutarEscenarioMapa() {
     })
     .catch(() => {
       alert("¡Ha ocurrido un error inesperado!");
-      localStorage.clear();
       window.location.reload();
     });
 }
@@ -422,7 +421,7 @@ async function mostrarEscenarioPreguntas() {
       var sgtePosY = movimiento.getSumarY() + posicionY;
 
       nuevoMapa[posicionY][posicionX] = "" + movimientoId;
-      if (mapa.getMatrix()[sgtePosY][sgtePosX] != " ") {
+      if (mapa.getMatrix()[sgtePosY][sgtePosX] == "X") {
         nuevoMapa[sgtePosY][sgtePosX] = "#";
         break;
       }
@@ -549,6 +548,7 @@ async function main() {
         })
         .catch(() => {
           alert("¡Ha ocurrido un error! Recarga la página.");
+          window.location.reload();
         });
     }
   });
