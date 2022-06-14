@@ -11,14 +11,19 @@ const render = $canvas.getContext("2d");
 const jugador = new Jugador();
 const partida = new Partida();
 
+// Función para obtener el elemento del DOM en base a un selector
 function $(selector) {
   return document.querySelector(selector);
 }
 
+// Función para obtener todos los elementos del DOM en base a un selector
 function $$(selector) {
   return document.querySelectorAll(selector);
 }
 
+// Función para la creación de una imagen, para el pintado
+// esta permite que si ya se ha cargado mantenga guardada
+// para que su solicitud no sea constante y tardosa
 function cargarImagen(url) {
   if (imagenes[url]) {
     return Promise.resolve(imagenes[url]);
@@ -207,23 +212,30 @@ function ejecutarEscenarioMovimiento(perdidaPorMuro = false) {
 
   // Comprobamos que aún hayan movimientos por recorrer
   if (partida.getJugadorMovimientos().length > partida.getJugadorSgteMovimiento() && !perdidaPorMuro) {
-
     const siguienteDireccion = partida.getJugadorMovimientos()[partida.getJugadorSgteMovimiento()];
     partida.setActualDireccion(siguienteDireccion);
     partida.setJugadorSgteMovimiento(partida.getJugadorSgteMovimiento() + 1);
     requestAnimationFrame(ejecutarEscenarioAnimacion);
-
-  } else if (partida.getActualMapa().getMatrix()[partida.getPosicionMatrix().getY()][partida.getPosicionMatrix().getX()] == "H") {
-    mostrarEscenarioResultado("¡HAS LLEGADO AL HELADO!");
-  } else if (perdidaPorMuro) {
-    mostrarEscenarioResultado("¡TE HAS TOPADO CON UN MURO!");
-  } else {
-    mostrarEscenarioResultado("¡NO LLEGASTE AL HELADO!");
+    return;
   }
   
+  // Comprobamos si el jugador perdió porqué se topo con un muro
+  if (perdidaPorMuro) {
+    mostrarEscenarioResultado("¡TE HAS TOPADO CON UN MURO!");
+    return;
+  }
+
+  // Comprobamos si la posición donde se encuentra el jugador es la posición de llegada
+  // para decirle al usuario que llego a la meta
+  if (partida.getActualMapa().getMatrix()[partida.getPosicionMatrix().getY()][partida.getPosicionMatrix().getX()] == "H") {
+    mostrarEscenarioResultado("¡HAS LLEGADO AL HELADO!");
+    return;
+  }
+  
+  // Si los casos anteriores no se ejecutan quiere decir que no se llegó ni se topo con un muro.
+  mostrarEscenarioResultado("¡NO LLEGASTE AL HELADO!");
+  
 }
-
-
 
 function mostrarSiguienteMapa() {
 
@@ -302,18 +314,31 @@ function mostrarEscenarioResultado(texto, animacion = 5) {
 // esto para nos sirve para que sepamos de ante-mano que el sistema
 // llega donde es necesario.
 function comprobarCamino(movimientos) {
+
+  // Iniciamos desde la posición inicial del mapa
   var posicionX = partida.getPosicionMatrix().getX();
   var posicionY = partida.getPosicionMatrix().getY();
+
+  // Recorremos todos los movimientos
   for (var movimiento of movimientos) {
+    
+    // Comprobamos si la siguiente posición (actualPosicion + direccion)
     var sgtePosX = movimiento.getSumarX() + posicionX;
     var sgtePosY = movimiento.getSumarY() + posicionY;
     var caracter = partida.getActualMapa().getMatrix()[sgtePosY][sgtePosX];
+
+    // Validamos que el camino que se está siguiendo sea vacío de lo contrario esta función
+    // retornaria false
     if (caracter != " " && caracter != "H") {
       return false;
     }
+
     posicionX = sgtePosX;
     posicionY = sgtePosY;
   }
+
+  // Comprobamos la última posición a la que llego el usuario
+  // para conocer si llego a la posición final
   return partida.getActualMapa().getMatrix()[posicionY][posicionX] == "H";
 }
 
@@ -326,7 +351,6 @@ function ejecutarEscenarioMapa() {
   for (var elemento of elementos) {
     movimientos.push(Direcciones[parseInt(elemento.getAttribute("data-movimiento"))]);
   }
-
 
   const jugador_id = jugador.getInfo().id;
   const actualPregunta = jugador.getPregunta();
@@ -369,15 +393,20 @@ function ejecutarEscenarioMapa() {
 
 function guardarMovimientos() {
   const movimientos = [];
+
+  // Obtenemos todos los movimientos y los convertimos en númerico para guardarlos
   const elementos = $$("#juego-grid-final-movimientos li");
   for (var elemento of elementos) {
     movimientos.push(parseInt(elemento.getAttribute("data-movimiento")));
   }
+
+  // Guardamos los pasos actuales
   jugador.setPasos(movimientos);
 }
 
 async function mostrarEscenarioPreguntas() {
   
+  // Recorremos todas las preguntas existentes
   for (var nivel of jugador.getNiveles()) {
     const indice = nivel.numero - 1;
     const mapa = Mapas[indice];
@@ -439,14 +468,13 @@ async function mostrarEscenarioPreguntas() {
 
 async function main() {
 
-  // Eventos
-
   // Ejecutar el mapa actual
   $("#juego-ejecutar").addEventListener("click", (evento) => {
     evento.target.disabled = true;
     ejecutarEscenarioMapa();
   });
 
+  // Mostrar el resulmen
   $("#preguntas-siguiente-boton").addEventListener("click", (evento) => {
     $("#preguntas-contenedor").classList.add("activo");
     evento.preventDefault();
@@ -454,44 +482,59 @@ async function main() {
     window.scrollTo(0, 0);
   });
 
+  // Controlamos las preguntas de satisfacción y sus respectivas respuestas del resumen 
   $("#preguntas-contenedor").addEventListener("click", (evento) => {
     evento.preventDefault();
     const elemento = evento.target;
-    if (elemento.classList.contains("preguntas-contendor-satisfacion-elem__button")) {
-      const elementoAnteActivo = elemento.parentNode.querySelector(
-        ".preguntas-contendor-satisfacion-elem__button.activo"
-      );
 
+    // Validamos si lo que se está interactuando es un boton
+    if (elemento.classList.contains("preguntas-contendor-satisfacion-elem__button")) {
+      const elementoAnteActivo = elemento.parentNode.querySelector(".preguntas-contendor-satisfacion-elem__button.activo");
       if (elementoAnteActivo) {
         elementoAnteActivo.classList.remove("activo");
       }
       elemento.classList.add("activo");
-    } else if (elemento.id === "preguntas-terminar-boton") {
+      return;
+    }
+    
+    // Validamos si el boton terminar es el que se está ejecutando
+    if (elemento.id === "preguntas-terminar-boton") {
+      
       const preguntas = $$(".preguntas-contendor-satisfacion-elem");
-      let completado = true;
       const respuestas = [];
+
+      // Recorremos todas las preguntas que existen
       for (var pregunta of preguntas) {
+
+        // Encontramos el número de la pregunta
         const numPregunta = parseInt(pregunta.getAttribute("data-pregunta"));
+
+        // Buscamos si tiene una respuesta activa
         const respuestaActiva = pregunta.querySelector("button.activo");
-        pregunta.classList.add("error");
+        
+        // Validamos que la pregunta tenga una respuesta, si no avisamos
         if (!respuestaActiva) {
+          pregunta.classList.add("error");
           alert(
             "¡Debes responder a la pregunta #" +
               numPregunta +
               " correspondiente!"
           );
-          completado = false;
-          break;
+          return;
         }
+
+        // Eliminamos por seguridad la clase error y además, agregamos a la lista de preguntas
+        // el formato correspondiente para enviarlo al servidor
         pregunta.classList.remove("error");
         respuestas.push({
           numero: numPregunta,
           respuesta: parseInt(respuestaActiva.innerText),
         });
+        
       }
-      if (!completado) {
-        return;
-      }
+
+      // Enviamos toda la información y avisamos que se ha terminado el test,
+      // continuamos a llevamos al apartado de estadísticas
       axios
         .post("/api/jugadores/pregunta", {
           jugador_id: jugador.getInfo().id,
@@ -510,25 +553,40 @@ async function main() {
     }
   });
 
+  // Boton de eliminar un movimiento
   $("#juego-grid-final-movimientos").addEventListener("click", (evento) => {
     const elemento = evento.target;
+
+    // Validamos que sea un boton que es un movimiento
     if (elemento.classList.contains("juego-elemento-info-boton")) {
       elemento.parentNode.parentNode.remove();
       guardarMovimientos();
     }
   });
 
+  // Creación de movimientos
   $("#juego-grid-movimientos").addEventListener("click", (evento) => {
     evento.preventDefault();
+
     var elemento = evento.target;
+
+    // Validamos si se le ha dado click a una imagen
+    // esto es para que se tome como prioridad su padre
+    // y no la imagen que no tiene información 
     if (elemento.nodeName.toLowerCase() === "img") {
       elemento = elemento.parentNode.parentNode;
     }
+
+    // Validamos que el elemento sea un movimiento valido
     if (elemento.hasAttribute("data-movimiento")) {
-      // Agregamos elementos.
+
+      // Clonamos el elemento (movimiento)
       const elementoClonado = elemento.cloneNode(true);
+
+      // Agregamos la clase para mostrar toda la información y no solo la imagen
       elementoClonado.classList.add("info");
 
+      // Seleccionamos la caja de movimientos y agregamos al final el elemento creado
       const movimientos = $("#juego-grid-final-movimientos");
       movimientos.appendChild(elementoClonado);
       movimientos.scrollTop = movimientos.scrollHeight;
@@ -541,26 +599,34 @@ async function main() {
   $("#inicio-contenedor-form").addEventListener("submit", function (evento) {
     evento.preventDefault();
 
+    // Validamos que el nombre cumpla al menos algunas cosas
     const nombre = $("#inicio-nombre-usuario").value;
-    if (nombre.trim().length <= 3) {
+    if (nombre.trim().length < 3) {
       alert("¡El nombre minimo debe ser por lo menos 3 carácteres!");
       return;
     }
 
+    // Enviamos la información al servidor, para su creación
     axios
       .post("/api/jugadores", {
         jugador: nombre,
       })
       .then((respuesta) => {
         if (respuesta.data) {
+
+          // Validamos que el servidor nos haya dejado crear el usuario o no
           if (respuesta.data.error === "EXISTE_JUGADOR") {
+
             alert("¡El nombre de jugador está siendo usado!");
           } else {
+
+            // Actualizamos la información local y ejecutamos el juego por primera vez
             jugador.setInfo(respuesta.data.success);
             jugador.setPregunta(1);
             jugador.setPasos([]);
             mostrarEscenarioMapa(Mapas[0]);
           }
+
         }
       });
   });
