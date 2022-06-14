@@ -1,10 +1,7 @@
 export default class Partida {
 
     constructor() {
-        this.posicionPixel = null;
         this.posicionMatrix = null;
-        this.ultimaPosicionMatrix = null;
-        this.animacionPosicionFinal = null;
         this.jugadorMovimientos = null;
         this.jugadorSgteMovimiento = 0;
         this.jugadorAnimando = false;
@@ -12,31 +9,6 @@ export default class Partida {
         this.actualDireccion = null;
         this.actualMapa = null;
         this.actualMapaIndex = 0;
-    }
-
-    getAnimacionPosicionFinal() {
-        return this.animacionPosicionFinal;
-    }
-
-    setAnimacionPosicionFinal(animacionPosicionFinal) {
-        this.animacionPosicionFinal = animacionPosicionFinal;
-    }
-
-    getUltimaPosicionMatrix() {
-        return this.ultimaPosicionMatrix;
-    }
-
-    setUltimaPosicionMatrix(ultimaPosicionMatrix) {
-        this.ultimaPosicionMatrix = ultimaPosicionMatrix;
-    }
-
-
-    getPosicionPixel() {
-        return this.posicionPixel;
-    }
-
-    setPosicionPixel(posicionPixel) {
-        this.posicionPixel = posicionPixel;
     }
 
     getPosicionMatrix() {
@@ -63,8 +35,8 @@ export default class Partida {
         return this.jugadorSgteMovimiento;
     }
 
-    incJugadorSgteMovimiento() {
-        this.jugadorSgteMovimiento++;
+    setJugadorSgteMovimiento(jugadorSgteMovimiento) {
+        this.jugadorSgteMovimiento = jugadorSgteMovimiento;
     }
 
     reiniciarJugadorMovimientos(movimientos) {

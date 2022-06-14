@@ -21,6 +21,7 @@ const pool = mysql.createPool({
 
 app.use(bodyParser.json());
 
+// Función para la creación de sentencias en la base de datos.
 function dbQuery(sentencia) {
   return new Promise(function (resolver, denegar) {
     pool.query(sentencia, function (error, resultados, fields) {
@@ -35,6 +36,7 @@ function dbQuery(sentencia) {
   });
 }
 
+// Función para el cálculo de estadísticas de preguntas
 app.get("/api/estadisticas/preguntas", async function (peticion, respuesta) {
   respuesta.json(await dbQuery(
     `SELECT 
@@ -51,6 +53,7 @@ app.get("/api/estadisticas/preguntas", async function (peticion, respuesta) {
   ));
 });
 
+// Función para el cálculo del top en base a los jugadores
 app.get("/api/estadisticas/top", async function (peticion, respuesta) {
   respuesta.json(await dbQuery(
     `SELECT 
@@ -67,6 +70,7 @@ app.get("/api/estadisticas/top", async function (peticion, respuesta) {
   ));
 });
 
+// Función para el cálculo de los niveles creados
 app.get("/api/estadisticas/general", async function (peticion, respuesta) {
   const resultado = await dbQuery(
     `SELECT mapa.numero, mapa.estado, COUNT(jugador_id) AS cantidad
@@ -75,10 +79,15 @@ app.get("/api/estadisticas/general", async function (peticion, respuesta) {
     WHERE jugador.estado = 1
     GROUP BY mapa.estado, mapa.numero;`
   );
+
+  // Se creará un arreglo uniendo los dos resultados que arroja la secuencia
   const objetos = [];
   for (var objeto of resultado) {
+
     var indice = objeto.numero - 1;
     var elemento = objetos[indice];
+
+    // Validamos si el objeto de la pregunta no exista, se crea automáticamente
     if (!elemento) {
       elemento = objetos[indice] = {
         numero: objeto.numero,
@@ -86,50 +95,58 @@ app.get("/api/estadisticas/general", async function (peticion, respuesta) {
         incorrectos: 0,
       };
     }
+
+    // Si el estado está activo, son la cantidad de preguntas correctas.
     if (objeto.estado) {
       elemento.correctos = objeto.cantidad;
     } else {
       elemento.incorrectos = objeto.cantidad;
     }
+
   }
   respuesta.json(objetos);
 });
 
 app.get("/api/jugadores/:id", async function (peticion, respuesta) {
+  
+  // Validamos que los datos ingresamos sean los correctos
   if (!(peticion.params && peticion.params.id)) {
     respuesta.status(400).end();
     return;
   }
+
+  // Seleccionamos el progreso actual de las preguntas que lleva el jugador guardados en la base de datos.
   const resultado = await dbQuery(`SELECT * FROM Mapa WHERE jugador_id = ${peticion.params.id}`);
   respuesta.json({
     success: resultado.map((x) => {
+      // Creamos un mapa para darle un formato mejor a la inofrmación traida de la base de datos
       return { numero: x.numero, estado: x.estado, pasos: JSON.parse(x.pasos) };
     }),
   });
+  
 });
 
 app.post("/api/jugadores/pregunta", async function (peticion, respuesta) {
-  if (
-    !(
-      peticion.body &&
-      peticion.body.hasOwnProperty("jugador_id") &&
-      peticion.body.hasOwnProperty("respuestas")
-    )
-  ) {
+
+  // Validamos que los datos sean los correctos
+  if (!(peticion.body &&peticion.body.hasOwnProperty("jugador_id") &&peticion.body.hasOwnProperty("respuestas"))) {
     respuesta.status(400).end();
     return;
   }
 
+  // Creamos la secuencia que deberemos ejecutar crear el registro en la base de datos
   const lineas = [];
   for (var lineaInsert of peticion.body.respuestas) {
     lineas.push(
       `(${peticion.body.jugador_id}, ${lineaInsert.numero}, ${lineaInsert.respuesta})`
     );
   }
-
   const resultadoPreguntas = await dbQuery(`INSERT INTO Pregunta (jugador_id, numero, satisfaccion) VALUES ${lineas.join(",")};`);
+  
+  // Actualizamos el estado del jugador
   const resultadoJugador = await dbQuery(`UPDATE Jugador SET estado = 1 WHERE id = ${peticion.body.jugador_id}`);
 
+  // Validamos que todo haya ocurrido según lo esperado, para proseguir al final de la partida.
   if (
     resultadoJugador &&
     resultadoJugador.affectedRows &&
@@ -143,20 +160,16 @@ app.post("/api/jugadores/pregunta", async function (peticion, respuesta) {
   respuesta.status(400).end();
 });
 
+// Función para guardar el estado de la pregunta, al estar seguro de que se ejecutará la animación
 app.post("/api/jugadores/mapa", async function (peticion, respuesta) {
-  if (
-    !(
-      peticion.body &&
-      peticion.body.hasOwnProperty("jugador_id") &&
-      peticion.body.hasOwnProperty("numero") &&
-      peticion.body.hasOwnProperty("pasos") &&
-      peticion.body.hasOwnProperty("estado")
-    )
-  ) {
+
+  // Validamos que los parametros enviados sean los correctos
+  if (!(peticion.body && peticion.body.hasOwnProperty("jugador_id") && peticion.body.hasOwnProperty("numero") && peticion.body.hasOwnProperty("pasos") && peticion.body.hasOwnProperty("estado"))) {
     respuesta.status(400).end();
     return;
   }
 
+  // Creamos el registro en la base de datos
   const resultaNuevo = await dbQuery(`INSERT INTO Mapa (jugador_id, numero, estado, pasos, cant_pasos) VALUES (${peticion.body.jugador_id}, ${peticion.body.numero}, ${peticion.body.estado}, '${JSON.stringify(peticion.body.pasos)}', ${peticion.body.pasos.length})`);
 
   // Se guardo correctamente
@@ -170,16 +183,23 @@ app.post("/api/jugadores/mapa", async function (peticion, respuesta) {
 });
 
 app.post("/api/jugadores", async function (peticion, respuesta) {
+
+  // Validamos que los parametros enviados sean los correctos
   if (!(peticion.body && peticion.body.jugador)) {
     respuesta.status(400).end();
     return;
   }
 
+  // Damos un formato mejor a los nombres, para que no tengamos ningún inconveniente o
+  // nombres errados
   var nombre = peticion.body.jugador;
   nombre = nombre.replaceAll("  ", " ").trim();
 
+  // Buscamos si existe algún nombre similar al ingresado
   const resultado = await dbQuery(`SELECT fecha, estado FROM Jugador WHERE LOWER(nombre) = '${nombre.toLowerCase()}'`);
   var nuevoJugador = resultado.length == 0;
+
+  // Validamos que si el jugador que existe no ha completado el formulario y han pasado 24 horas para establecerlo como utilizable
   if (!nuevoJugador && !resultado[resultado.length - 1].estado) {
     const fechaAnterior = new Date(resultado[resultado.length - 1].fecha);
     if (Date.now() - fechaAnterior.getTime() >= 24 * 60 * 60 * 1000) {

@@ -119,12 +119,6 @@ async function mostrarEscenarioMapa(mapa) {
   // Cambiar la ubicación a nivel de matrix:
   partida.setPosicionMatrix(mapa.getUbicacionInicial().clonar());
 
-  // Cambiar la ubicación a nivel de lienzo (pintar para la animación)
-  const posicionPixel = mapa.getUbicacionInicial().clonar();
-  posicionPixel.setX(posicionPixel.getX() * 16);
-  posicionPixel.setY(posicionPixel.getY() * 16 - 3);
-  partida.setPosicionPixel(posicionPixel);
-
   recalcularTamanioMapa();
   renderizarMapa();
 }
@@ -171,69 +165,42 @@ function recalcularTamanioMapa() {
 
 function ejecutarEscenarioAnimacion() {
 
+  partida.setJugadorAnimando(true);
+
   const actualDireccion = partida.getActualDireccion();
   const mapa = partida.getActualMatrix();
 
-  // Sumamos un pixel a la posición, para que el renderizado muestre que se estuviera movimiendo
-  partida.getPosicionMatrix().setX(partida.getPosicionMatrix().getX() + actualDireccion.getSumarX());
-  partida.getPosicionMatrix().setY(partida.getPosicionMatrix().getY() + actualDireccion.getSumarY());
-
-
-
-  renderizarMapa();
-
-}
-
-function ejecutarEscenarioAnimacion2() {
-  const actualDireccion = partida.getActualDireccion();
-  const mapa = partida.getActualMatrix();
-
-  const validacionAbajo = actualDireccion.getI() === 0 && partida.getPosicionPixel().getY() >= partida.getAnimacionPosicionFinal().getY();
-  const validacionArriba = actualDireccion.getI() === 1 && partida.getPosicionPixel().getY() <= partida.getAnimacionPosicionFinal().getY();
-  const validacionIzquierda = actualDireccion.getI() === 2 && partida.getPosicionPixel().getX() <= partida.getAnimacionPosicionFinal().getX();
-  const validacionDerecha = actualDireccion.getI() === 3 && partida.getPosicionPixel().getX() >= partida.getAnimacionPosicionFinal().getX();
-
-  const validarMuro = mapa[partida.getPosicionMatrix().getY()][partida.getPosicionMatrix().getX()] === "X";
-
-  if (
-    validacionArriba ||
-    validacionDerecha ||
-    validacionAbajo ||
-    validacionIzquierda ||
-    validarMuro
-  ) {
-    // Terminó de moverse
-    partida.setJugadorAnimando(false);
-
-    // Hacemos que si se ha pegado contra un muro, se muestre,
-    // una imagen diferente, que significa que se pego contra el muro
-    if (validarMuro) {
-      mapa[partida.getPosicionMatrix().getY()][partida.getPosicionMatrix().getX()] = "#";
-    }
-
-    // Dejar el rastro correspondiente
-    if (
-      mapa[partida.getUltimaPosicionMatrix().getY()][partida.getUltimaPosicionMatrix().getX()] != "H"
-    ) {
-      mapa[partida.getUltimaPosicionMatrix().getY()][partida.getUltimaPosicionMatrix().getX()] = actualDireccion.getI() + "";
-    }
-
-    // Ha terminado de moverse
-    requestAnimationFrame(function () {
-      // Creamos una función temporal para pasar el estado si se perdió porqué llego a un muro.
-      ejecutarEscenarioMovimiento(validarMuro);
-    });
-  } else {
-
-    // Sumamos un pixel a la posición, para que el renderizado muestre que se estuviera movimiendo
-    partida.getPosicionPixel().setX(partida.getPosicionPixel().getX() + actualDireccion.getSumarX());
-    partida.getPosicionPixel().setY(partida.getPosicionPixel().getY() + actualDireccion.getSumarY());
-
-    // Ejecutar el siguiente renderizado de movimiento, aún no ha terminado de animarse
-    requestAnimationFrame(ejecutarEscenarioAnimacion);
+  // Siguiente mapa
+  const posX = partida.getPosicionMatrix().getX();
+  const posY = partida.getPosicionMatrix().getY();
+ 
+  // Comprobamos que no estemos reemplazando la imagen de llegada por el recorrido que hace el usuario.
+  if (mapa[posY][posX] !== 'H') {
+    mapa[posY][posX] = "" + actualDireccion.getI();
   }
 
-  renderizarMapa(mapa);
+  // Sumamos la dirección a las posiciones actuales, para conocer cuál es el siguiente X y Y
+  const siguienteX = posX + actualDireccion.getSumarX();
+  const siguienteY = posY + actualDireccion.getSumarY();
+
+  // Validamos si no se ha llegado a un muro
+  const llegoMuro = mapa[siguienteY][siguienteX] === "X";
+  if (llegoMuro) {
+    mapa[siguienteY][siguienteX] = "#";
+  } else {
+    partida.getPosicionMatrix().setX(siguienteX);
+    partida.getPosicionMatrix().setY(siguienteY);
+  }
+
+  // Renderizamos el mapa resultante
+  partida.setJugadorAnimando(false);
+  renderizarMapa();
+
+  // Ejecutamos el siguiente movimiento
+  setTimeout(function() {
+    ejecutarEscenarioMovimiento(llegoMuro);
+  }, 300);
+
 }
 
 function ejecutarEscenarioMovimiento(perdidaPorMuro = false) {
@@ -242,23 +209,10 @@ function ejecutarEscenarioMovimiento(perdidaPorMuro = false) {
   if (partida.getJugadorMovimientos().length > partida.getJugadorSgteMovimiento() && !perdidaPorMuro) {
 
     const siguienteDireccion = partida.getJugadorMovimientos()[partida.getJugadorSgteMovimiento()];
-
-    // Cambiar y guardar la respectiva posición entorno a la matriz
-    partida.setUltimaPosicionMatrix(partida.getPosicionMatrix().clonar());
-
-    // Animación en base a pixeles para el lienzo
-    partida.setAnimacionPosicionFinal(
-      new Vector2D(
-        siguienteDireccion.getSumarX() * 16 + partida.getPosicionPixel().getX(),
-        siguienteDireccion.getSumarY() * 16 + partida.getPosicionPixel().getY()
-      )
-    );
-
-    partida.setJugadorAnimando(true);
     partida.setActualDireccion(siguienteDireccion);
-    partida.incJugadorSgteMovimiento();
-
+    partida.setJugadorSgteMovimiento(partida.getJugadorSgteMovimiento() + 1);
     requestAnimationFrame(ejecutarEscenarioAnimacion);
+
   } else if (partida.getActualMapa().getMatrix()[partida.getPosicionMatrix().getY()][partida.getPosicionMatrix().getX()] == "H") {
     mostrarEscenarioResultado("¡HAS LLEGADO AL HELADO!");
   } else if (perdidaPorMuro) {
@@ -266,7 +220,10 @@ function ejecutarEscenarioMovimiento(perdidaPorMuro = false) {
   } else {
     mostrarEscenarioResultado("¡NO LLEGASTE AL HELADO!");
   }
+  
 }
+
+
 
 function mostrarSiguienteMapa() {
 
@@ -370,11 +327,8 @@ function ejecutarEscenarioMapa() {
     movimientos.push(Direcciones[parseInt(elemento.getAttribute("data-movimiento"))]);
   }
 
-  // Iniciamos la animación del jugador
-  partida.reiniciarJugadorMovimientos(movimientos);
-  ejecutarEscenarioMovimiento();
 
-  /* const jugador_id = jugador.getInfo().id;
+  const jugador_id = jugador.getInfo().id;
   const actualPregunta = jugador.getPregunta();
   const esMapaGanado = comprobarCamino(movimientos);
 
@@ -410,7 +364,7 @@ function ejecutarEscenarioMapa() {
       alert("¡Ha ocurrido un error inesperado!");
       localStorage.clear();
       window.location.reload();
-    }); */
+    });
 }
 
 function guardarMovimientos() {
