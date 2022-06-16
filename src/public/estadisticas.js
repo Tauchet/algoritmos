@@ -62,10 +62,31 @@ async function cargarTablaSatisfaccion() {
   }
 }
 
+async function cargarCoeficiente() {
+  const $cantidad = document.querySelector(".correlacion-cant");
+  const $selectorNivel = document.querySelector("#selector-nivel");
+  const $selectorPregunta = document.querySelector("#selector-pregunta");
+  const respuesta = await axios.get("/api/estadisticas/coeficiente/" + $selectorNivel.value + "/" + $selectorPregunta.value);
+  if (respuesta.data.error) {
+    $cantidad.innerText = "¡No hay datos suficientes!";
+  } else {
+    $cantidad.innerText = "Coeficiente: " + respuesta.data.resultado;
+  }
+}
+
 async function main() {
   await cargarTablaJugadores();
   await cargarTablaPreguntas();
   await cargarTablaSatisfaccion();
+  await cargarCoeficiente();
+
+  const $selects = document.querySelectorAll("select");
+  for (var $select of $selects) {
+    $select.addEventListener("change", function() {
+      cargarCoeficiente();
+    })
+  }
+
 }
 
 main();

@@ -33,6 +33,7 @@ td {
     display: flex;
     flex-direction: column;
     gap: 5rem;
+    align-items: center;
 }
 
 table {
@@ -48,4 +49,57 @@ table {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+.btn {
+    border: 4px solid #A69E92;
+    background-color: #5E5347;
+    padding: 0.8rem 2rem;
+    font-size: 0.9rem;
+    color: #DAD0C2;
+    transition: .4s;
+    cursor: pointer;
+}
+
+.btn.big {
+    padding: 1rem 3rem;
+}
+
+.btn:not(:disabled):hover {
+    border-color: #DAD0C2;
+    color: #f1e8db;
+    transform: scale(0.9);
+}
+
+label {
+    font-size: 0.8rem;
+}
+
+select {
+    margin-top: 1rem;
+    display: block;
+    width: 100%;
+    background-color: #6B5E50;
+    outline: none;
+    padding: 1rem 0.5rem;
+    color: white;
+    border: 4px solid #aaa192;
+    transition: 0.4s;
+    width: 100%;
+}
+
+select:focus {
+    border-color: #CDBDA6;
+}
+
+#correlacion {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.correlacion-campo {
+    margin-top: 1rem;
 }

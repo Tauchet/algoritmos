@@ -10,6 +10,10 @@
 <body>
     
     <main id="app">
+
+	<div>
+		<a href='/' class='btn big'>VOLVER AL INICIO</a>
+	</div>
         
         <div class="tabla-contenido">
             <div class="tabla-titulo">
@@ -51,6 +55,33 @@
                     <th>Jugadores</th>
                 </tr>
             </table>
+        </div>
+
+        <div id="correlacion">
+            <div class="correlacion-titulo">
+                <h3>COEFICIENTE DE CORRELACIÓN</h3>
+            </div>
+            <div class="correlacion-campo">
+                <label for="selector-nivel">Mapa</label>
+                <select id="selector-nivel" >
+                  <option value="1" selected>Nivel 1</option>
+                  <option value="2">Nivel 2</option>
+                  <option value="3">Nivel 3</option>
+                  <option value="4">Nivel 4</option>
+                  <option value="5">Nivel 5</option>
+                </select>
+            </div>
+            <div class="correlacion-campo">
+                <label for="selector-pregunta">Pregunta</label>
+                <select id="selector-pregunta">
+                  <option value="1" selected>¿QUÉ TAN COMPLEJOS LE PARECIERON LOS MAPAS?</option>
+                  <option value="2">¿QUÉ TANTO SE DIVIRTIÓ COMPLENTANDO LOS MAPAS?</option>
+                  <option value="3">¿QUÉ TAN INTUITIVO LE PARECIÓ LA FUNCIONALIDAD DEL JUEGO?</option>
+                </select>
+            </div>
+            <div class="correlacion-campo correlacion-cant">
+                <h2>COEFICIENTE: 0</h2>
+            </div>
         </div>
         
     </main>

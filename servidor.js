@@ -36,6 +36,48 @@ function dbQuery(sentencia) {
   });
 }
 
+// Función de coeficiente de correlación
+app.get("/api/estadisticas/coeficiente/:n/:p", async function (peticion, respuesta) {
+
+  // Peticiones totales  
+  const preguntas = await dbQuery("SELECT p.satisfaccion AS valor FROM Jugador j INNER JOIN Pregunta p ON p.jugador_id = j.id WHERE p.numero = " + peticion.params.p + " AND j.estado = 1;");
+  const niveles = await dbQuery("SELECT m.estado AS valor FROM Jugador j INNER JOIN Mapa m ON m.jugador_id = j.id WHERE m.numero = " + peticion.params.n + " AND j.estado = 1;");
+  
+  // Variables globales
+  var suma = 0;
+  var mediaX = 0;
+  var mediaY = 0;
+
+  for (var registro of preguntas) {
+    suma += registro.valor;
+  }
+  mediaX = suma / preguntas.length;
+  suma = 0;
+
+  for (var registro of niveles) {
+    suma += registro.valor;
+  }
+  mediaY = suma / niveles.length;
+  suma = 0;
+
+  var pxy, sx2, sy2;
+  pxy= sx2= sy2= 0;
+  for(var i = 0; i < preguntas.length; i++) {
+    pxy += (preguntas[i].valor-mediaX) * (niveles[i].valor-mediaY);
+    sx2 += (preguntas[i].valor-mediaX) * (preguntas[i].valor-mediaX);
+    sy2 += (niveles[i].valor-mediaY) * (niveles[i].valor-mediaY);
+  }
+
+  var b = Math.sqrt(sx2*sy2);
+  if (b == 0) {
+    respuesta.json({error: true});
+    return;
+  }
+
+  respuesta.json({resultado: (pxy / b)})
+
+});
+
 // Función para el cálculo de estadísticas de preguntas
 app.get("/api/estadisticas/preguntas", async function (peticion, respuesta) {
   respuesta.json(await dbQuery(
