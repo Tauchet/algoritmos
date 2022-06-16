@@ -1,3 +1,13 @@
+/*
+
+Presentado por:
+- Henry Guillen Ramirez
+- Luis Alfredo Gonzalez Jimenez
+- Juan Esteban Chacon
+- Cristian Camilo Guevara López
+
+*/
+
 import Jugador from "./juego/Jugador.js";
 import Direcciones from "./juego/Direccion.js";
 import Mapas from "./juego/Mapa.js";
@@ -403,37 +413,59 @@ function guardarMovimientos() {
   jugador.setPasos(movimientos);
 }
 
+// Función para mostrar el escenario final, donde se mostrará un resumen de todas las preguntas
+// y la encuesta de satisfacción del mismo
 async function mostrarEscenarioPreguntas() {
   
   // Recorremos todas las preguntas existentes
   for (var nivel of jugador.getNiveles()) {
+
+
     const indice = nivel.numero - 1;
     const mapa = Mapas[indice];
+
+    // Creamos una copia del mapa, esto para que lo podamos modificar
+    // y crear el camino respectivo que ejecuto el jugador anteriormente
     const nuevoMapa = [...mapa.getMatrix()];
 
+    // Obtenemos la primera dirección y posición donde inicia el jugador
     var ultimaDireccion = mapa.getDireccionInicial().getI();
     var posicionX = mapa.getUbicacionInicial().getX();
     var posicionY = mapa.getUbicacionInicial().getY();
+
+    // Recorremos todos los pasos que ha ejecutado el jugador
     for (var movimientoId of nivel.pasos) {
       ultimaDireccion = movimientoId;
+
+      // Convertimos el índice del movimiento en una dirección,
+      // esto para encontrar cuál sería su X y Y que debería sumarse
       const movimiento = Direcciones[movimientoId];
       var sgtePosX = movimiento.getSumarX() + posicionX;
       var sgtePosY = movimiento.getSumarY() + posicionY;
 
+      // Colocamos la posición del movimiento, para que se muestre
+      // el recorrido
       nuevoMapa[posicionY][posicionX] = "" + movimientoId;
+
+      // Validamos que la siguiente posición no haya sido un muro, si es así
+      // se mostrará el estado de eliminado
       if (mapa.getMatrix()[sgtePosY][sgtePosX] == "X") {
         nuevoMapa[sgtePosY][sgtePosX] = "#";
         break;
       }
 
+      // Cambiamos la posición actual, por la que nos dió como resultado
       posicionX = sgtePosX;
       posicionY = sgtePosY;
     }
 
+    // Creamos un elemento temporal para mostrar el camino que se ha realizado
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
     canvas.width = nuevoMapa[0].length * 16;
     canvas.height = nuevoMapa.length * 16;
+
+    // Utilizamos la función que renderiza el mapa
     await renderizarCanvas(
       context,
       nuevoMapa,
@@ -442,18 +474,22 @@ async function mostrarEscenarioPreguntas() {
       ultimaDireccion
     );
 
+    // Obtenemos la imagen de la pregunta definidia en HTML
     const imagen = $(`.pregunta-respuesta[data-numero='${nivel.numero}'] img`);
     imagen.style.width = `calc(${canvas.width}px * 2)`;
     imagen.src = canvas.toDataURL();
 
+    // Obtenemos el elemento donde se encuentra la pregunta, para dar el resultado correcto
     const componente = $(`.pregunta-respuesta[data-numero='${nivel.numero}']`);
     componente.classList.remove("correcto");
     componente.classList.remove("incorrecto");
 
+    // Obtenemos el elemento donde se muestra el estado de la pregunta
     const componentEstado = $(
       `.pregunta-respuesta[data-numero='${nivel.numero}'] p`
     );
 
+    // Validamos que el estado de la pregunta sea correcto o no
     if (nivel.estado) {
       componente.classList.add("correcto");
       componentEstado.innerText = "RESPUESTA CORRECTA";
@@ -462,9 +498,12 @@ async function mostrarEscenarioPreguntas() {
       componentEstado.innerText = "RESPUESTA INCORRECTA";
     }
   }
+
+  // Mostramos el escenario
   cambiarEscenario("preguntas");
 }
 
+// Función que se ejecuta por primera vez, cada vez que la página se recarga.
 async function main() {
 
   // Ejecutar el mapa actual

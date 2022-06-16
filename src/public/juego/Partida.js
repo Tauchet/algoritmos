@@ -1,3 +1,16 @@
+/*
+
+Presentado por:
+- Henry Guillen Ramirez
+- Luis Alfredo Gonzalez Jimenez
+- Juan Esteban Chacon
+- Cristian Camilo Guevara López
+
+*/
+
+// Clase para la utilización de datos de juego de la aplicación
+// esta clase sirve para todos los datos relacionados
+// para el movimiento, aceptación o no del nivel
 export default class Partida {
 
     constructor() {

@@ -1,3 +1,13 @@
+/*
+
+Presentado por:
+- Henry Guillen Ramirez
+- Luis Alfredo Gonzalez Jimenez
+- Juan Esteban Chacon
+- Cristian Camilo Guevara López
+
+*/
+
 String.prototype.replaceAll = function (search, replacement = "") {
   var target = this;
   return target.split(search).join(replacement);
@@ -265,16 +275,20 @@ app.post("/api/jugadores", async function (peticion, respuesta) {
   respuesta.json({ error: "EXISTE_JUGADOR" });
 });
 
+// Función para la exposición de archivos estáticos
 app.use("/public", serveStatic(path.join(__dirname, "src/public"), {index: false}));
 
+// Función para mostrar el archivo HTML de estadísticas
 app.get("/estadisticas", function (peticion, respuesta) {
   respuesta.sendFile(__dirname + "/src/estadisticas.html");
 });
 
+// Función para mostrar el archivo HTML general
 app.get("/", function (peticion, respuesta) {
   respuesta.sendFile(__dirname + "/src/index.html");
 });
 
+// Función para redireccionar en caso de no encontrar la ruta deseada
 app.use("*", function (peticion, respuesta) {
   respuesta.redirect("/");
 });

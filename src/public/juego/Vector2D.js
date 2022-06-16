@@ -1,3 +1,14 @@
+/*
+
+Presentado por:
+- Henry Guillen Ramirez
+- Luis Alfredo Gonzalez Jimenez
+- Juan Esteban Chacon
+- Cristian Camilo Guevara López
+
+*/
+
+// Clase para un manejo más rápido de las posiciones de un jugador en el juego
 export default class Vector2D {
 
     constructor(x, y) {
